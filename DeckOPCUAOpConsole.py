@@ -33,17 +33,16 @@ from opcua import ua
 import time as Time
 
 # Define time-related variables
-CINT = 0.1 # 0.1 hours = 360 seconds = 6 minutes
-TFIN = 10 # hours simulation (if time_units is equal to Hours)
+CINT = 1 # 1 time-unit (seconds in this case)
+TFIN = 10000 # seconds simulation (if time_units is equal to Seconds)
 TSTOP = 0
-time_units = "Hours" # Other options: "Minutes" or "Seconds"
-fac = 360 # Speedup factor
+time_units = "Seconds" # Other options: "Minutes" or "Hours"
+fac = 5 # Speedup factor
 verbosity = 1  # 0: No verbosity, 1: Verbosity
 port = 16701  # Port where deck OPC UA server is listening
  
 # Connecting to the OPC UA server
 client = Client(f"opc.tcp://localhost:{port}") # If second argument: read/write request timeout
-# client.connect()
 
 # Connect to deck
 while True:
@@ -64,11 +63,15 @@ print("Reset done")
 Time.sleep(1)
 
 # Run. This runs the experiment for model initialization
-# command = client.get_node("ns=6; s=command_run")
-# command.set_value(ua.Variant(1, ua.VariantType.Int32))
+command = client.get_node("ns=6; s=command_run")
+command.set_value(ua.Variant(1, ua.VariantType.Int32))
 
 print("Run done")
 Time.sleep(1)
+
+# Init TIME to 0
+var = client.get_node("ns=4; s=TIME")
+var.set_value(ua.Variant(0, ua.VariantType.Double))
 
 # Set CINT value to a proper one
 var = client.get_node("ns=4; s=CINT")
